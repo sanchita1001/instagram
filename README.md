@@ -17,6 +17,11 @@ A full-stack Instagram Clone built using the MERN stack, featuring user authenti
 
 ## 🛠️ Tech Stack
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white" />
+  <img src="https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=black" />
+</p>
+
 ### Frontend
 
 * React.js
