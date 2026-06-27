@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { clearErrors, getAllMessages, sendMessage } from '../../actions/messageAction';
 import { getUserDetailsById } from '../../actions/userAction';
@@ -185,10 +185,12 @@ const Inbox = () => {
                             <div className="flex py-3 px-6 border-b items-center justify-between">
                                 <div className="flex gap-2 items-center">
                                     <div className="w-8 h-8 relative">
-                                        <img draggable="false" loading="lazy" className="w-full h-full rounded-full object-cover" src={friend.avatar} alt="avatar" />
+                                        <Link to={`/${friend.username}`}>
+                                            <img draggable="false" loading="lazy" className="w-full h-full rounded-full object-cover cursor-pointer" src={friend.avatar} alt="avatar" />
+                                        </Link>
                                         {isOnline && <div className="absolute -right-0.5 -bottom-0.5 h-3 w-3 bg-green-500 rounded-full"></div>}
                                     </div>
-                                    <span className="font-medium cursor-pointer">{friend.name}</span>
+                                    <Link to={`/${friend.username}`} className="font-medium cursor-pointer hover:underline">{friend.name}</Link>
                                 </div>
                                 <svg className="cursor-pointer" aria-label="View Thread Details" color="#262626" fill="#262626" height="24" role="img" viewBox="0 0 24 24" width="24"><circle cx="12.001" cy="12.005" fill="none" r="10.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></circle><circle cx="11.819" cy="7.709" r="1.25"></circle><line fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="10.569" x2="13.432" y1="16.777" y2="16.777"></line><polyline fill="none" points="10.569 11.05 12 11.05 12 16.777" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></polyline></svg>
                             </div>
@@ -206,7 +208,9 @@ const Inbox = () => {
                                 {isTyping &&
                                     <>
                                         <div className="flex items-center gap-3 max-w-xs">
-                                            <img draggable="false" loading="lazy" className="w-7 h-7 rounded-full object-cover" src={friend.avatar} alt="avatar" />
+                                            <Link to={`/${friend.username}`}>
+                                                <img draggable="false" loading="lazy" className="w-7 h-7 rounded-full object-cover cursor-pointer" src={friend.avatar} alt="avatar" />
+                                            </Link>
                                             <span className="text-sm text-gray-500">typing...</span>
                                         </div>
                                         <div ref={scrollRef}></div>
@@ -224,7 +228,10 @@ const Inbox = () => {
                                     <div className="absolute bottom-14 -left-10">
                                         <Picker
                                             set="google"
-                                            onSelect={(e) => setMessage(message + e.native)}
+                                            onSelect={(e) => {
+                                                setMessage(message + e.native);
+                                                setShowEmojis(false);
+                                            }}
                                             title="Emojis"
                                         />
                                     </div>

@@ -23,6 +23,8 @@ const Profile = () => {
     const [viewModal, setViewModal] = useState(false);
     const [followersModal, setFollowersModal] = useState(false);
     const [savedTab, setSavedTab] = useState(false);
+    const [profileMenuToggle, setProfileMenuToggle] = useState(false);
+    const [activeTab, setActiveTab] = useState('posts'); // 'posts', 'saved', 'reels', 'tagged'
 
     const { user, error, loading } = useSelector((state) => state.userDetails);
     const { user: loggedInUser } = useSelector((state) => state.user);
@@ -126,7 +128,24 @@ const Profile = () => {
                                         ) : (
                                             <button onClick={handleFollow} className="font-medium bg-primary-blue text-sm text-white hover:shadow rounded px-6 py-1.5">Follow</button>
                                         )}
-                                        <span className="sm:block hidden">{metaballsMenu}</span>
+                                        <div className="relative">
+                                            <span onClick={() => setProfileMenuToggle(!profileMenuToggle)} className="sm:block hidden cursor-pointer">{metaballsMenu}</span>
+                                            
+                                            {profileMenuToggle && (
+                                                <>
+                                                    <div onClick={() => setProfileMenuToggle(false)} className="fixed inset-0 z-10"></div>
+                                                    <div className="absolute right-0 top-10 w-52 bg-white rounded drop-shadow-2xl border z-20">
+                                                        <div className="flex flex-col w-full overflow-hidden rounded">
+                                                            <button onClick={() => {
+                                                                navigator.clipboard.writeText(window.location.href);
+                                                                toast.success('Profile link copied to clipboard');
+                                                                setProfileMenuToggle(false);
+                                                            }} className="p-3 text-sm text-left hover:bg-gray-50">Copy Profile URL</button>
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -159,21 +178,33 @@ const Profile = () => {
 
                         {/* tabs */}
                         <div className="flex gap-12 justify-center">
-                            <span onClick={() => setSavedTab(false)} className={`${savedTab ? 'text-gray-400' : 'border-t border-black'} py-3 cursor-pointer flex items-center text-[13px] uppercase gap-3 tracking-[1px] font-medium`}>
-                                {savedTab ? postsIconOutline : postsIconFill} posts</span>
+                            <span onClick={() => { setSavedTab(false); setActiveTab('posts'); }} className={`${activeTab === 'posts' ? 'border-t border-black' : 'text-gray-400'} py-3 cursor-pointer flex items-center text-[13px] uppercase gap-3 tracking-[1px] font-medium`}>
+                                {activeTab === 'posts' ? postsIconFill : postsIconOutline} posts</span>
                             {user._id === loggedInUser._id && (
-                                <span onClick={() => setSavedTab(true)} className={`${savedTab ? 'border-t border-black' : 'text-gray-400'} py-3 cursor-pointer flex items-center text-[13px] uppercase gap-3 tracking-[1px] font-medium`}>
-                                    {savedTab ? savedIconFill : savedIconOutline} saved</span>
+                                <span onClick={() => { setSavedTab(true); setActiveTab('saved'); }} className={`${activeTab === 'saved' ? 'border-t border-black' : 'text-gray-400'} py-3 cursor-pointer flex items-center text-[13px] uppercase gap-3 tracking-[1px] font-medium`}>
+                                    {activeTab === 'saved' ? savedIconFill : savedIconOutline} saved</span>
                             )}
-                            <span className="py-3 flex items-center text-gray-400 text-[13px] uppercase gap-3 tracking-[1px] font-medium">
+                            <span onClick={() => { setSavedTab(false); setActiveTab('reels'); }} className={`${activeTab === 'reels' ? 'border-t border-black' : 'text-gray-400'} py-3 cursor-pointer flex items-center text-[13px] uppercase gap-3 tracking-[1px] font-medium`}>
                                 {reelsIcon} reels</span>
-                            <span className="py-3 hidden sm:flex items-center text-gray-400 text-[13px] uppercase gap-3 tracking-[1px] font-medium">
+                            <span onClick={() => { setSavedTab(false); setActiveTab('tagged'); }} className={`${activeTab === 'tagged' ? 'border-t border-black' : 'text-gray-400'} py-3 cursor-pointer hidden sm:flex items-center text-[13px] uppercase gap-3 tracking-[1px] font-medium`}>
                                 {taggedIcon} tagged</span>
                         </div>
 
                         {/* posts grid data */}
-                        {savedTab ?
+                        {activeTab === 'saved' ?
                             <PostContainer posts={user?.saved} id={"saved"} /> :
+                            activeTab === 'reels' ?
+                            <div className="flex flex-col items-center justify-center py-12">
+                                <div className="text-5xl mb-4">🎬</div>
+                                <h3 className="text-xl font-medium mb-2">No Reels Yet</h3>
+                                <p className="text-gray-500 text-sm">Reels you post will appear here</p>
+                            </div> :
+                            activeTab === 'tagged' ?
+                            <div className="flex flex-col items-center justify-center py-12">
+                                <div className="text-5xl mb-4">🏷️</div>
+                                <h3 className="text-xl font-medium mb-2">No Tagged Posts</h3>
+                                <p className="text-gray-500 text-sm">Posts you're tagged in will appear here</p>
+                            </div> :
                             user?.posts?.length > 0 ?
                                 <PostContainer posts={user?.posts} id={"posts"} /> :
                                 <div className="bg-white mt-2 mb-10 drop-shadow-sm rounded flex sm:flex-row flex-col sm:gap-0 gap-5 sm:p-0 p-4 items-center justify-between">

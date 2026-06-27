@@ -3,6 +3,7 @@ import { exploreOutline, homeFill, homeOutline, likeOutline, messageFill, messag
 import { Link, useLocation } from 'react-router-dom';
 import ProfileDetails from './ProfileDetails';
 import NewPost from './NewPost';
+import Notifications from './Notifications';
 import { useSelector } from 'react-redux';
 import SearchBox from './SearchBar/SearchBox';
 
@@ -13,6 +14,7 @@ const Header = () => {
 
     const [profileToggle, setProfileToggle] = useState(false)
     const [newPost, setNewPost] = useState(false);
+    const [notificationToggle, setNotificationToggle] = useState(false);
 
     const location = useLocation();
     const [onHome, setOnHome] = useState(false);
@@ -42,13 +44,17 @@ const Header = () => {
                     <div onClick={() => setNewPost(true)} className="cursor-pointer">{postUploadOutline}</div>
 
                     <span className="hidden sm:block">{exploreOutline}</span>
-                    <span className="hidden sm:block">{likeOutline}</span>
+                    <span onClick={() => setNotificationToggle(!notificationToggle)} className="hidden sm:block cursor-pointer">{likeOutline}</span>
 
                     <div onClick={() => setProfileToggle(!profileToggle)} className={`${(profileToggle || (!onHome && !onChat)) ? 'border-black border' : ''} rounded-full cursor-pointer h-7 w-7 p-[0.5px]`}><img draggable="false" loading="lazy" className="w-full h-full rounded-full object-cover" src={user.avatar} alt="" /></div>
                 </div>
 
                 {profileToggle &&
                     <ProfileDetails setProfileToggle={setProfileToggle} />
+                }
+
+                {notificationToggle &&
+                    <Notifications setNotificationToggle={setNotificationToggle} />
                 }
 
                 <NewPost newPost={newPost} setNewPost={setNewPost} />

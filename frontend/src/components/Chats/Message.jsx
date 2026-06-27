@@ -1,5 +1,6 @@
+import { Link } from 'react-router-dom';
 
-const Message = ({ ownMsg, avatar, content }) => {
+const Message = ({ ownMsg, avatar, content, username }) => {
     return (
         ownMsg ?
             content === '❤️' ?
@@ -9,12 +10,16 @@ const Message = ({ ownMsg, avatar, content }) => {
             :
             content === '❤️' ?
                 <div className="flex items-end gap-2 max-w-xs">
-                    <img draggable="false" className="w-7 h-7 rounded-full object-cover" src={avatar} alt="avatar" />
+                    <Link to={`/${username}`}>
+                        <img draggable="false" className="w-7 h-7 rounded-full object-cover cursor-pointer" src={avatar} alt="avatar" />
+                    </Link>
                     <span className="items-end text-4xl">{content}</span>
                 </div>
                 :
                 <div className="flex items-end gap-2 max-w-xs">
-                    <img draggable="false" className="w-7 h-7 rounded-full object-cover" src={avatar} alt="avatar" />
+                    <Link to={`/${username}`}>
+                        <img draggable="false" className="w-7 h-7 rounded-full object-cover cursor-pointer" src={avatar} alt="avatar" />
+                    </Link>
                     <span className="px-4 py-3 text-sm bg-gray-200 rounded-3xl max-w-xs overflow-hidden">{content}</span>
                 </div>
     )
