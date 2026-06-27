@@ -15,13 +15,12 @@ A full-stack Instagram Clone built using the MERN stack, featuring user authenti
 * ☁️ Cloudinary Integration for Image Storage
 * 📱 Responsive Design
 
-```md
 ## 🛠️ Tech Stack
 
 <p align="center">
   <img src="https://skillicons.dev/icons?i=react,redux,tailwind,nodejs,express,mongodb,docker,git,github&perline=5" />
 </p>
-```
+
 
 
 
