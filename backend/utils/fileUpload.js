@@ -1,61 +1,77 @@
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
-// Ensure upload directories exist
-const uploadDirProfiles = path.join(__dirname, '../../public/uploads/profiles');
-const uploadDirPosts = path.join(__dirname, '../../public/uploads/posts');
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
-if (!fs.existsSync(uploadDirProfiles)) {
-    fs.mkdirSync(uploadDirProfiles, { recursive: true });
-}
-if (!fs.existsSync(uploadDirPosts)) {
-    fs.mkdirSync(uploadDirPosts, { recursive: true });
-}
-
-const storageProfiles = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadDirProfiles);
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '_' + uniqueSuffix + path.extname(file.originalname));
+// Cloudinary storage for avatars/profiles
+const storageProfiles = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'instagram/profiles',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+        resource_type: 'auto'
     }
 });
 
-const storagePosts = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadDirPosts);
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '_' + uniqueSuffix + path.extname(file.originalname));
+// Cloudinary storage for posts
+const storagePosts = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'instagram/posts',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+        resource_type: 'auto'
     }
 });
 
-const localUploadAvatar = multer({
+const cloudinaryUploadAvatar = multer({
     storage: storageProfiles,
     limits: {
-        fileSize: 1024 * 1024 * 5
+        fileSize: 1024 * 1024 * 5 // 5MB limit
+    },
+    fileFilter: (req, file, cb) => {
+        // Check file type
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Invalid file type. Only images are allowed.'), false);
+        }
     }
 });
 
-const localUploadPost = multer({
+const cloudinaryUploadPost = multer({
     storage: storagePosts,
     limits: {
-        fileSize: 1024 * 1024 * 5
+        fileSize: 1024 * 1024 * 10 // 10MB limit
+    },
+    fileFilter: (req, file, cb) => {
+        // Check file type
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Invalid file type. Only images are allowed.'), false);
+        }
     }
 });
 
-// Wrap multer middleware to inject the location property on req.file (for compatibility with controllers using req.file.location)
+// Wrap multer middleware to ensure req.file.location is set
 exports.uploadAvatar = {
     single: (fieldname) => {
-        const upload = localUploadAvatar.single(fieldname);
+        const upload = cloudinaryUploadAvatar.single(fieldname);
         return (req, res, next) => {
             upload(req, res, (err) => {
-                if (err) return next(err);
+                if (err) {
+                    console.error('Upload error:', err);
+                    return next(err);
+                }
                 if (req.file) {
-                    req.file.location = `/public/uploads/profiles/${req.file.filename}`;
+                    // Set location to Cloudinary URL
+                    req.file.location = req.file.path;
                 }
                 next();
             });
@@ -65,12 +81,16 @@ exports.uploadAvatar = {
 
 exports.uploadPost = {
     single: (fieldname) => {
-        const upload = localUploadPost.single(fieldname);
+        const upload = cloudinaryUploadPost.single(fieldname);
         return (req, res, next) => {
             upload(req, res, (err) => {
-                if (err) return next(err);
+                if (err) {
+                    console.error('Upload error:', err);
+                    return next(err);
+                }
                 if (req.file) {
-                    req.file.location = `/public/uploads/posts/${req.file.filename}`;
+                    // Set location to Cloudinary URL
+                    req.file.location = req.file.path;
                 }
                 next();
             });
@@ -78,16 +98,26 @@ exports.uploadPost = {
     }
 };
 
+// Delete file from Cloudinary
 exports.deleteFile = async (fileuri) => {
     if (!fileuri) return;
     try {
-        // e.g., /public/uploads/profiles/filename.jpg -> public/uploads/profiles/filename.jpg
-        const relativePath = fileuri.replace(/^\//, '');
-        const absolutePath = path.join(__dirname, '../../', relativePath);
-        if (fs.existsSync(absolutePath)) {
-            fs.unlinkSync(absolutePath);
+        // Extract public_id from Cloudinary URL
+        // Example URL: https://res.cloudinary.com/xxx/image/upload/v123/instagram/posts/filename.jpg
+        const urlParts = fileuri.split('/');
+        const uploadIndex = urlParts.indexOf('upload');
+        if (uploadIndex !== -1 && uploadIndex + 2 < urlParts.length) {
+            // Get everything after 'upload/v123/'
+            const publicIdWithExt = urlParts.slice(uploadIndex + 2).join('/');
+            // Remove file extension
+            const publicId = publicIdWithExt.replace(/\.[^/.]+$/, '');
+            
+            await cloudinary.uploader.destroy(publicId);
+            console.log(`Deleted file from Cloudinary: ${publicId}`);
         }
     } catch (error) {
-        console.error("Failed to delete local file:", error);
+        console.error("Failed to delete Cloudinary file:", error);
     }
 };
+
+module.exports.cloudinary = cloudinary;
