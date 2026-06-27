@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  db:
+    image: mongo:6.0
+    container_name: instagram_mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  web:
+    build: .
+    container_name: instagram_web
+    restart: always
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./backend/config/config.env
+    depends_on:
+      - db
+    volumes:
+      - uploads_data:/app/public/uploads
+
+volumes:
+  mongo_data:
+  uploads_data:
