@@ -34,7 +34,7 @@ A full-stack Instagram Clone built using the MERN stack, featuring user authenti
 Create a `config.env` file inside the backend directory and add:
 
 ```env
-PORT=4000
+PORT=
 JWT_EXPIRE=
 COOKIE_EXPIRE=
 NODE_ENV=
