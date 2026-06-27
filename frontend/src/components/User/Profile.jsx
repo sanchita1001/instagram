@@ -22,7 +22,6 @@ const Profile = () => {
     const [follow, setFollow] = useState(false);
     const [viewModal, setViewModal] = useState(false);
     const [followersModal, setFollowersModal] = useState(false);
-    const [savedTab, setSavedTab] = useState(false);
     const [profileMenuToggle, setProfileMenuToggle] = useState(false);
     const [activeTab, setActiveTab] = useState('posts'); // 'posts', 'saved', 'reels', 'tagged'
 
@@ -178,15 +177,15 @@ const Profile = () => {
 
                         {/* tabs */}
                         <div className="flex gap-12 justify-center">
-                            <span onClick={() => { setSavedTab(false); setActiveTab('posts'); }} className={`${activeTab === 'posts' ? 'border-t border-black' : 'text-gray-400'} py-3 cursor-pointer flex items-center text-[13px] uppercase gap-3 tracking-[1px] font-medium`}>
+                            <span onClick={() => setActiveTab('posts')} className={`${activeTab === 'posts' ? 'border-t border-black' : 'text-gray-400'} py-3 cursor-pointer flex items-center text-[13px] uppercase gap-3 tracking-[1px] font-medium`}>
                                 {activeTab === 'posts' ? postsIconFill : postsIconOutline} posts</span>
                             {user._id === loggedInUser._id && (
-                                <span onClick={() => { setSavedTab(true); setActiveTab('saved'); }} className={`${activeTab === 'saved' ? 'border-t border-black' : 'text-gray-400'} py-3 cursor-pointer flex items-center text-[13px] uppercase gap-3 tracking-[1px] font-medium`}>
+                                <span onClick={() => setActiveTab('saved')} className={`${activeTab === 'saved' ? 'border-t border-black' : 'text-gray-400'} py-3 cursor-pointer flex items-center text-[13px] uppercase gap-3 tracking-[1px] font-medium`}>
                                     {activeTab === 'saved' ? savedIconFill : savedIconOutline} saved</span>
                             )}
-                            <span onClick={() => { setSavedTab(false); setActiveTab('reels'); }} className={`${activeTab === 'reels' ? 'border-t border-black' : 'text-gray-400'} py-3 cursor-pointer flex items-center text-[13px] uppercase gap-3 tracking-[1px] font-medium`}>
+                            <span onClick={() => setActiveTab('reels')} className={`${activeTab === 'reels' ? 'border-t border-black' : 'text-gray-400'} py-3 cursor-pointer flex items-center text-[13px] uppercase gap-3 tracking-[1px] font-medium`}>
                                 {reelsIcon} reels</span>
-                            <span onClick={() => { setSavedTab(false); setActiveTab('tagged'); }} className={`${activeTab === 'tagged' ? 'border-t border-black' : 'text-gray-400'} py-3 cursor-pointer hidden sm:flex items-center text-[13px] uppercase gap-3 tracking-[1px] font-medium`}>
+                            <span onClick={() => setActiveTab('tagged')} className={`${activeTab === 'tagged' ? 'border-t border-black' : 'text-gray-400'} py-3 cursor-pointer hidden sm:flex items-center text-[13px] uppercase gap-3 tracking-[1px] font-medium`}>
                                 {taggedIcon} tagged</span>
                         </div>
 
