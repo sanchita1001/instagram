@@ -72,7 +72,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 ### Clone the repository
 
 ```bash
-git clone https://github.com/sanchota1001/instagram.git
+git clone https://github.com/sanchita1001/instagram.git
 cd instagram
 ```
 
